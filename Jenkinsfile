@@ -3,7 +3,7 @@ pipeline {
 
   stages {
 
-    stage('Checkout') {
+    stage('build') {
       steps {
         git 'https://github.com/Arun12415/devops-ai.git'
       }

@@ -5,7 +5,8 @@ pipeline {
 
     stage('build') {
       steps {
-        git 'https://github.com/Arun12415/devops-ai.git'
+        git  branch: 'main',
+        url 'https://github.com/Arun12415/devops-ai.git'
       }
     }
 

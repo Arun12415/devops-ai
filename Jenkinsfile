@@ -1,6 +1,10 @@
 pipeline {
   agent any
 
+  environment {
+    OPENAI_API_KEY = credentials('openai-key')
+  }
+
   stages {
 
     stage('Build') {
@@ -24,7 +28,7 @@ pipeline {
 
     stage('Run Container') {
       steps {
-        sh 'docker run -d -p 3000:3000 devops-ai'
+        sh 'docker run -d -p 3000:3000 -e OPENAI_API_KEY=$OPENAI_API_KEY devops-ai'
       }
     }
   }

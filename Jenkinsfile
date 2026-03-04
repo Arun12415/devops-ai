@@ -18,7 +18,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('sonarqube-server') {
+                withSonarQubeEnv('sonarqube') {
                     sh '''
                     sonar-scanner \
                     -Dsonar.projectKey=devops-ai \
@@ -32,7 +32,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $arunrao12:latest .'
+                sh 'docker build -t $IMAGE_NAME:latest .'
             }
         }
 
@@ -40,7 +40,7 @@ pipeline {
             steps {
                 sh '''
                 docker login -u $DOCKERHUB_CREDS_USR -p $DOCKERHUB_CREDS_PSW
-                docker push $arunrao12:latest
+                docker push $IMAGE_NAME:latest
                 '''
             }
         }
@@ -70,12 +70,12 @@ pipeline {
 
         success {
             emailext (
-                subject: "SUCCESS: Jenkins Build ${1}",
+                subject: "SUCCESS: Jenkins Build ${BUILD_NUMBER}",
                 body: """
 Build Successful!
 
-Job: ${Devops-ai}
-Build Number: ${1}
+Job: ${JOB_NAME}
+Build Number: ${BUILD_NUMBER}
 
 Application URL:
 http://localhost:3000
@@ -86,12 +86,12 @@ http://localhost:3000
 
         failure {
             emailext (
-                subject: "FAILED: Jenkins Build ${1}",
+                subject: "FAILED: Jenkins Build ${BUILD_NUMBER}",
                 body: """
 Build Failed!
 
-Job: ${Devops-ai}
-Build Number: ${1}
+Job: ${JOB_NAME}
+Build Number: ${BUILD_NUMBER}
 
 Please check Jenkins logs.
 """,

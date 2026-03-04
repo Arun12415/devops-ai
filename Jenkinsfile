@@ -18,14 +18,16 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('Sonarqube') {
-                    sh '''
-                    sonar-scanner \
-                    -Dsonar.projectKey=devops-ai \
-                    -Dsonar.sources=. \
-                    -Dsonar.host.url=http://localhost:9000 \
-                    -Dsonar.login=admin
-                    '''
+                script {
+                    def scannerHome = tool 'Sonarqube'
+                    withSonarQubeEnv('Sonarqube') {
+                        sh """
+                        ${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=devops-ai \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=http://localhost:9000
+                        """
+                    }
                 }
             }
         }
@@ -69,7 +71,7 @@ pipeline {
     post {
 
         success {
-            emailext (
+            emailext(
                 subject: "SUCCESS: Jenkins Build ${BUILD_NUMBER}",
                 body: """
 Build Successful!
@@ -85,7 +87,7 @@ http://localhost:3000
         }
 
         failure {
-            emailext (
+            emailext(
                 subject: "FAILED: Jenkins Build ${BUILD_NUMBER}",
                 body: """
 Build Failed!

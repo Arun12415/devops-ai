@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        OPENAI_API_KEY = credentials('openai-key')
         DOCKERHUB_CREDS = credentials('dockercred')
         IMAGE_NAME = "arunrao12/devops-ai"
     }
@@ -49,15 +48,17 @@ pipeline {
 
         stage('Deploy Container') {
             steps {
-                sh """
-                docker rm -f devops-ai || true
+                withCredentials([string(credentialsId: 'openai-key', variable: 'OPENAI_KEY')]) {
+                    sh """
+                    docker rm -f devops-ai || true
 
-                docker run -d \
-                --name devops-ai \
-                -p 3000:3000 \
-                -e OPENAI_API_KEY=${OPENAI_API_KEY} \
-                ${IMAGE_NAME}:latest
-                """
+                    docker run -d \
+                    --name devops-ai \
+                    -p 3000:3000 \
+                    -e OPENAI_API_KEY=${OPENAI_KEY} \
+                    ${IMAGE_NAME}:latest
+                    """
+                }
             }
         }
 

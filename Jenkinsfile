@@ -28,7 +28,11 @@ pipeline {
 
     stage('Run Container') {
       steps {
-        sh 'docker run -d -p 3000:3000 -e OPENAI_API_KEY=$OPENAI_API_KEY devops-ai'
+        sh '''
+        docker stop devops-ai || true
+        docker rm devops-ai || true
+        docker run -d --name devops-ai -p 3000:3000 -e OPENAI_API_KEY=$OPENAI_API_KEY devops-ai
+        '''
       }
     }
   }

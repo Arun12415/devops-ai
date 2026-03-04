@@ -34,36 +34,36 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME:latest .'
+                sh "docker build -t ${IMAGE_NAME}:latest ."
             }
         }
 
         stage('Push Docker Image to DockerHub') {
             steps {
-                sh '''
-                docker login -u $DOCKERHUB_CREDS_USR -p $DOCKERHUB_CREDS_PSW
-                docker push $IMAGE_NAME:latest
-                '''
+                sh """
+                docker login -u ${DOCKERHUB_CREDS_USR} -p ${DOCKERHUB_CREDS_PSW}
+                docker push ${IMAGE_NAME}:latest
+                """
             }
         }
 
         stage('Deploy Container') {
             steps {
-                sh '''
-                docker stop devops-ai || true
-                docker rm devops-ai || true
+                sh """
+                docker rm -f devops-ai || true
+
                 docker run -d \
                 --name devops-ai \
                 -p 3000:3000 \
-                -e OPENAI_API_KEY=$OPENAI_API_KEY \
-                $IMAGE_NAME:latest
-                '''
+                -e OPENAI_API_KEY=${OPENAI_API_KEY} \
+                ${IMAGE_NAME}:latest
+                """
             }
         }
 
         stage('Verify Deployment') {
             steps {
-                sh 'docker ps'
+                sh "docker ps"
             }
         }
     }
